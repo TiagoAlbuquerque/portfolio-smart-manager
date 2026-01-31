@@ -1,0 +1,335 @@
+{{ define "templates_js" }}
+<template id="fund-template">
+    <div class="fund-item bg-gray-50/50 rounded-2xl border border-gray-100 p-5 relative transition-all hover:shadow-md">
+        <div class="flex-between mb-4 gap-4">
+            <div class="flex items-start gap-4 flex-1">
+                <div class="flex flex-col items-center gap-3 shrink-0 pt-1">
+                    <div
+                        class="flex flex-col -space-y-1 bg-white rounded-lg border border-gray-100 shadow-sm overflow-hidden">
+                        <button
+                            class="move-up-btn p-1.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor">
+                                <use href="/static/icons.svg#icon-chevron-up" />
+                            </svg>
+                        </button>
+                        <button
+                            class="move-down-btn p-1.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all border-t border-gray-50">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor">
+                                <use href="/static/icons.svg#icon-chevron-down" />
+                            </svg>
+                        </button>
+                    </div>
+                    <input type="checkbox"
+                        class="fund-active-toggle w-5 h-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer shadow-sm"
+                        checked>
+                </div>
+
+                <div class="flex-1">
+                    <input type="text"
+                        class="fund-name bg-transparent border-b-2 border-transparent focus:border-indigo-500 outline-none font-bold text-gray-800 text-xl py-1 transition-all w-full mb-1"
+                        placeholder="Ticker ou Nome do Ativo">
+                    <div class="flex flex-col">
+                        <div class="flex flex-wrap gap-3 items-center">
+                            <div
+                                class="asset-total-equity text-[11px] font-black text-indigo-800 bg-indigo-100 px-2 py-0.5 rounded shadow-sm">
+                                Património: R$ 0,00</div>
+                            <!-- Yield Badge Wrapper -->
+                            <div class="group relative cursor-help">
+                                <div
+                                    class="asset-return-badge text-[10px] font-bold px-2 py-0.5 rounded border flex items-center gap-1 shadow-sm transition-colors">
+                                    Yield: 0.00%
+                                </div>
+                                <div
+                                    class="hidden group-hover:block absolute bottom-full left-1/2 -translate-x-1/2 mb-1 w-32 p-1.5 bg-gray-800 text-white text-[8px] rounded shadow-lg z-50 normal-case font-medium">
+                                    Rentabilidade total (Lucro / Total Investido).
+                                </div>
+                            </div>
+
+                            <!-- Risk Badge Wrapper -->
+                            <div class="group relative cursor-help">
+                                <div class="asset-variability-badge text-[10px] font-black uppercase text-amber-600">
+                                    Risco: --
+                                </div>
+                                <div
+                                    class="hidden group-hover:block absolute bottom-full left-1/2 -translate-x-1/2 mb-1 w-40 p-1.5 bg-gray-800 text-white text-[8px] rounded shadow-lg z-50 normal-case font-medium">
+                                    Medido pelo desvio padrão da taxa de retorno semanal. Quanto maior, mais instável.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="asset-total-invested text-[9px] font-medium text-gray-400 mt-1 pl-1">Investido:
+                            R$ 0,00</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <button class="remove-fund-btn p-2 text-red-200 hover:text-red-500 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor">
+                        <use href="/static/icons.svg#icon-trash" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Botão Expandir (Divisor) -->
+        <div class="flex justify-center mt-2 relative mb-2">
+            <div class="absolute inset-0 flex items-center" aria-hidden="true">
+                <div class="w-full border-t border-gray-200/60"></div>
+            </div>
+            <div class="relative flex justify-center">
+                <button
+                    class="toggle-details-btn bg-white border border-gray-200 text-gray-400 hover:text-indigo-600 hover:border-indigo-300 rounded-full p-1.5 shadow-sm transition-all duration-200 hover:shadow-md group transform hover:scale-105"
+                    title="Ver Análise Detalhada">
+                    <svg class="chevron-icon w-4 h-4 transition-transform duration-300" fill="none"
+                        stroke="currentColor">
+                        <use href="/static/icons.svg#icon-chevron-expand" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Conteúdo Expandível (Inputs + Gráficos) -->
+        <div class="w-full details-content">
+
+            <!-- GRID DE INPUTS (Movido para cá) -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-2 mb-6 w-full">
+                <!-- Section 1: Aportes -->
+                <div class="flex flex-col bg-white/50 p-3 rounded-xl border border-gray-100 shadow-sm">
+                    <div class="flex justify-between items-center mb-2 pb-1 border-b border-gray-100">
+                        <label
+                            class="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1 italic">Aportes</label>
+                        <button
+                            class="add-aporte-btn text-[9px] font-bold text-indigo-500 bg-indigo-50 hover:bg-indigo-100 hover:text-indigo-700 px-2 py-1 rounded-md transition-colors flex items-center gap-1">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor">
+                                <use href="/static/icons.svg#icon-plus-small" />
+                            </svg>
+                            Adicionar
+                        </button>
+                    </div>
+
+                    <div class="aportes-wrapper overflow-y-auto max-h-[280px] pr-1 mb-1 custom-scroll">
+                        <div class="aportes-container flex flex-col gap-3"></div>
+                    </div>
+                </div>
+
+                <!-- Section 2: Histórico de Saldo -->
+                <div class="flex flex-col bg-white/50 p-3 rounded-xl border border-gray-100 shadow-sm">
+                    <div class="flex justify-between items-center mb-2 pb-1 border-b border-gray-100">
+                        <label
+                            class="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1 italic">Histórico
+                            de Saldo</label>
+                        <button
+                            class="add-balance-btn text-[9px] font-bold text-indigo-500 bg-indigo-50 hover:bg-indigo-100 hover:text-indigo-700 px-2 py-1 rounded-md transition-colors flex items-center gap-1">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                            </svg>
+                            Adicionar
+                        </button>
+                    </div>
+
+                    <div class="balance-wrapper overflow-y-auto max-h-[280px] pr-1 mb-1 custom-scroll">
+                        <div class="balance-container flex flex-col gap-2"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GRID DE ANÁLISE (Existente) -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+
+                <!-- 1. Evolução Patrimonial -->
+                <div
+                    class="lg:col-span-12 asset-line-container bg-white rounded-2xl p-4 border border-indigo-50 shadow-sm">
+                    <div class="flex justify-between items-center mb-2">
+                        <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest italic">Evolução
+                            Patrimonial</h3>
+                        <div class="flex items-center gap-2">
+                            <div class="asset-chart-filters flex gap-1 items-center">
+                                <button data-filter="12M"
+                                    class="filter-btn text-[8px] font-bold text-gray-400 bg-white border border-gray-100 px-1.5 py-0.5 rounded hover:bg-gray-50 transition-colors">12M</button>
+                                <button data-filter="YTD"
+                                    class="filter-btn text-[8px] font-bold text-gray-400 bg-white border border-gray-100 px-1.5 py-0.5 rounded hover:bg-gray-50 transition-colors">YTD</button>
+                                <button data-filter="MAX"
+                                    class="filter-btn active text-[8px] font-bold text-gray-400 bg-white border border-gray-100 px-1.5 py-0.5 rounded hover:bg-gray-50 transition-colors">Máx</button>
+                                <div class="w-px h-3 bg-gray-100 mx-0.5"></div>
+                                <select
+                                    class="asset-year-select text-[8px] font-bold text-gray-400 bg-white border border-gray-100 px-1 py-0.5 rounded hover:bg-gray-50 transition-colors outline-none cursor-pointer">
+                                    <option value="">Ano</option>
+                                </select>
+                            </div>
+                            <div class="asset-total-equity-big text-xl font-black text-indigo-900">R$ 0,00</div>
+                        </div>
+                    </div>
+                    <canvas class="asset-line-canvas"></canvas>
+                </div>
+
+                <!-- 2. Forecast Momentum -->
+                <div class="lg:col-span-8 bg-indigo-50/30 rounded-2xl p-5 border border-indigo-100">
+                    <p class="text-[9px] font-black text-gray-400 uppercase mb-3 tracking-widest text-center">
+                        Projeção (Estimada)</p>
+
+                    <!-- Headers -->
+                    <div class="grid grid-cols-2 gap-6 mb-3">
+                        <div class="text-center">
+                            <span class="text-[8px] font-black text-indigo-900 uppercase block">Taxa Histórica
+                                (H)</span>
+                            <div class="asset-first-speed text-[7px] font-bold text-indigo-400 mt-1 h-4">--</div>
+                        </div>
+                        <div class="text-center">
+                            <span class="text-[8px] font-bold text-indigo-400 uppercase block">Momentum (R)</span>
+                            <div class="asset-last-speed text-[7px] font-bold text-indigo-300 mt-1 h-4">--</div>
+                        </div>
+                    </div>
+
+                    <!-- Data Rows -->
+                    <div class="space-y-2">
+                        <!-- 6 meses -->
+                        <div class="grid grid-cols-2 gap-6">
+                            <div class="grid grid-cols-[auto_1fr] gap-2 items-center border-r border-indigo-100 pr-3">
+                                <span class="text-[10px] font-black text-indigo-950 text-right">6m:</span>
+                                <span class="proj-6-first text-[10px] font-black text-indigo-950 text-right">--</span>
+                            </div>
+                            <div class="grid grid-cols-[auto_1fr] gap-2 items-center pl-3">
+                                <span class="text-[9px] font-bold text-indigo-600 text-right">6m:</span>
+                                <span class="proj-6-last text-[9px] font-bold text-indigo-600 text-right">--</span>
+                            </div>
+                        </div>
+
+                        <!-- 12 meses -->
+                        <div class="grid grid-cols-2 gap-6">
+                            <div class="grid grid-cols-[auto_1fr] gap-2 items-center border-r border-indigo-100 pr-3">
+                                <span class="text-[10px] font-black text-indigo-950 text-right">12m:</span>
+                                <span class="proj-12-first text-[10px] font-black text-indigo-950 text-right">--</span>
+                            </div>
+                            <div class="grid grid-cols-[auto_1fr] gap-2 items-center pl-3">
+                                <span class="text-[9px] font-bold text-indigo-600 text-right">12m:</span>
+                                <span class="proj-12-last text-[9px] font-bold text-indigo-600 text-right">--</span>
+                            </div>
+                        </div>
+
+                        <!-- 24 meses -->
+                        <div class="grid grid-cols-2 gap-6">
+                            <div class="grid grid-cols-[auto_1fr] gap-2 items-center border-r border-indigo-100 pr-3">
+                                <span class="text-[10px] font-black text-indigo-950 text-right">24m:</span>
+                                <span class="proj-24-first text-[10px] font-black text-indigo-950 text-right">--</span>
+                            </div>
+                            <div class="grid grid-cols-[auto_1fr] gap-2 items-center pl-3">
+                                <span class="text-[9px] font-bold text-indigo-600 text-right">24m:</span>
+                                <span class="proj-24-last text-[9px] font-bold text-indigo-600 text-right">--</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Aderência à Alocação -->
+                <div class="lg:col-span-4 flex flex-col gap-3">
+                    <div
+                        class="bg-white rounded-2xl p-5 border border-indigo-100 shadow-sm relative overflow-hidden h-full flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">
+                                        Aderência</p>
+                                    <div
+                                        class="asset-deviation-badge text-[10px] font-black uppercase px-2 py-0.5 rounded-md inline-block shadow-sm transition-all">
+                                        --</div>
+                                </div>
+                                <div class="flex flex-col items-end gap-1">
+                                    <label class="text-[8px] font-black text-gray-400 uppercase">Target</label>
+                                    <div class="relative">
+                                        <input type="number"
+                                            class="fund-target-pct w-14 p-1 text-xs font-black text-indigo-700 bg-gray-50 border border-indigo-100 rounded-lg text-center"
+                                            value="0">
+                                        <span
+                                            class="absolute right-1 top-1 text-[8px] font-bold text-indigo-300">%</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-between items-center mb-2 px-1">
+                                <span class="text-[9px] font-bold text-gray-400">Real / Alvo</span>
+                                <span class="asset-compliance-pct text-[11px] font-black text-indigo-600">0% /
+                                    0%</span>
+                            </div>
+                        </div>
+
+                        <div class="relative w-full bg-gray-100 h-6 rounded-full overflow-visible">
+                            <div class="asset-current-bar h-full rounded-full transition-all duration-700 ease-out shadow-inner"
+                                style="width: 0%"></div>
+                            <div class="target-marker h-8" style="left: 0%; top: -4px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="aporte-row-template">
+    <div
+        class="aporte-row group bg-white p-3 rounded-xl border border-gray-100 shadow-sm transition-all hover:border-indigo-100 hover:shadow-md relative">
+
+        <button
+            class="remove-aporte-btn absolute top-2 right-2 text-gray-300 hover:text-red-500 transition-colors p-1 rounded-full hover:bg-red-50"
+            title="Remover este aporte">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor">
+                <use href="/static/icons.svg#icon-close" />
+            </svg>
+        </button>
+
+        <div class="grid grid-cols-12 gap-3 items-end mb-2">
+            <div class="col-span-4">
+                <label class="label-sm mb-0.5 block">Aplicado</label>
+                <input type="text" inputmode="numeric"
+                    class="aporte-value w-full text-xs font-bold outline-none border-b border-gray-200 focus:border-indigo-500 py-0.5 text-gray-700 transition-colors"
+                    placeholder="0,00">
+            </div>
+            <div class="col-span-4">
+                <label class="label-sm mb-0.5 block">Retorno</label>
+                <input type="text" inputmode="numeric"
+                    class="aporte-return w-full text-xs font-bold outline-none border-b border-gray-200 focus:border-indigo-500 py-0.5 text-gray-700 transition-colors"
+                    placeholder="0,00">
+            </div>
+            <div class="col-span-4">
+                <label class="label-sm mb-0.5 block">Data</label>
+                <input type="date"
+                    class="aporte-date w-full text-[10px] outline-none border-b border-gray-200 py-0.5 text-gray-600 focus:border-indigo-500 transition-colors">
+            </div>
+        </div>
+        <div class="row-metrics flex flex-wrap justify-between items-center border-t border-gray-50 pt-2 px-0.5 gap-2">
+            <div class="metric-aporte-equity text-[10px] font-black text-indigo-800 bg-indigo-50 px-1.5 py-0.5 rounded">
+                Hoje: --</div>
+            <div class="metric-yield text-[9px] font-bold text-gray-500">Rent: --</div>
+            <div class="metric-weekly text-[9px] font-black text-indigo-600">Rate: --</div>
+            <div class="metric-benchmark text-[9px] font-bold text-gray-400">% Bench: --</div>
+        </div>
+    </div>
+</template>
+
+<template id="balance-row-template">
+    <div
+        class="balance-row flex items-center gap-3 bg-white p-2.5 rounded-lg border border-gray-100 shadow-sm hover:border-indigo-100 transition-all">
+        <div class="flex-1 relative">
+            <label class="text-[9px] font-black text-gray-400 uppercase tracking-wider mb-0.5 block">Saldo
+                Real</label>
+            <div class="relative">
+                <span class="absolute left-0 top-1/2 -translate-y-1/2 text-[10px] font-bold text-gray-400">R$</span>
+                <input type="text" inputmode="numeric"
+                    class="balance-value w-full text-sm bg-transparent border-b border-gray-100 outline-none font-bold text-indigo-800 pl-5 focus:border-indigo-500 transition-colors"
+                    placeholder="0,00">
+            </div>
+        </div>
+        <div class="flex-1">
+            <label class="text-[9px] font-black text-gray-400 uppercase tracking-wider mb-0.5 block">Data</label>
+            <input type="date"
+                class="balance-date w-full text-xs bg-transparent border-b border-gray-100 outline-none font-medium text-gray-600 focus:border-indigo-500 transition-colors">
+        </div>
+        <button class="remove-balance-btn text-gray-300 hover:text-red-500 p-1 self-end mb-1">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                </path>
+            </svg>
+        </button>
+    </div>
+</template>
+{{ end }}

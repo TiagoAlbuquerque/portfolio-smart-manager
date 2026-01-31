@@ -1,0 +1,226 @@
+body {
+    font-family: 'Inter', sans-serif;
+}
+
+.chart-container {
+    position: relative;
+    height: 180px;
+    width: 100%;
+}
+
+.history-chart-container {
+    position: relative;
+    height: 150px;
+    width: 100%;
+}
+
+.asset-line-container {
+    position: relative;
+    height: 220px;
+    width: 100%;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+}
+
+/* Custom Scrollbar Styles */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+@keyframes pulse-soft {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.animate-pulse-soft {
+    animation: pulse-soft 2s infinite;
+}
+
+/* Animações para Change Blindness */
+@keyframes flash-green {
+    0% {
+        color: #16a34a;
+        transform: scale(1.02);
+    }
+
+    100% {
+        color: #3730a3;
+        transform: scale(1);
+    }
+}
+
+@keyframes flash-red {
+    0% {
+        color: #dc2626;
+        transform: scale(1.02);
+    }
+
+    100% {
+        color: #3730a3;
+        transform: scale(1);
+    }
+}
+
+.animate-flash-green {
+    animation: flash-green 0.6s ease-out;
+}
+
+.animate-flash-red {
+    animation: flash-red 0.6s ease-out;
+}
+
+.fund-item.disabled-asset {
+    opacity: 0.5;
+    filter: grayscale(0.5);
+}
+
+.last-aporte-highlight {
+    border-color: #4f46e5 !important;
+    background-color: #f5f3ff !important;
+}
+
+.target-marker {
+    position: absolute;
+    top: -4px;
+    bottom: -4px;
+    width: 2px;
+    background-color: #1e1b4b;
+    z-index: 10;
+}
+
+.details-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+    opacity: 0;
+}
+
+.details-content.expanded {
+    max-height: 2000px;
+    opacity: 1;
+    margin-top: 0px;
+    padding-top: 0.1rem;
+}
+
+.chevron-icon {
+    transition: transform 0.3s ease;
+}
+
+.chevron-icon.rotated {
+    transform: rotate(180deg);
+}
+
+/* Estilo para Botão de Filtro Ativo */
+.filter-btn.active {
+    background-color: #e0e7ff;
+    color: #4338ca;
+    font-weight: 800;
+}
+
+/* ========================================
+   CLASSES UTILITÁRIAS (Redução de HTML)
+   ======================================== */
+
+/* Labels padrão */
+.label-sm {
+    font-size: 10px;
+    font-weight: 900;
+    color: rgb(156 163 175);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Input base padrão */
+.input-base {
+    width: 100%;
+    font-size: 0.75rem;
+    font-weight: 700;
+    outline: none;
+    border-bottom: 1px solid rgb(229 231 235);
+    padding-top: 0.125rem;
+    padding-bottom: 0.125rem;
+    color: rgb(55 65 81);
+    transition: border-color 0.2s;
+}
+
+.input-base:focus {
+    border-color: rgb(99 102 241);
+}
+
+/* Flex entre itens */
+.flex-between {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Badge métrica padrão */
+.badge-metric {
+    font-size: 10px;
+    font-weight: 900;
+    padding: 0.125rem 0.5rem;
+    border-radius: 0.25rem;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+}
+
+/* Container de seção */
+.section-card {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    border: 1px solid rgb(243 244 246);
+}
+
+/* Botões de filtro */
+.filter-btn-base {
+    font-size: 9px;
+    font-weight: 700;
+    color: rgb(107 114 128);
+    background-color: white;
+    border: 1px solid rgb(229 231 235);
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    transition: background-color 0.2s;
+}
+
+.filter-btn-base:hover {
+    background-color: rgb(249 250 251);
+}
+
+/* Grid de projeções */
+.projection-value {
+    font-size: 10px;
+    font-weight: 900;
+}
+
+/* Tooltip icon */
+.tooltip-icon {
+    width: 0.75rem;
+    height: 0.75rem;
+    color: rgb(209 213 219);
+    cursor: help;
+}
