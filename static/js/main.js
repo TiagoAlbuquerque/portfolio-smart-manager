@@ -1,6 +1,6 @@
 import { formatBRL, formatPct, formatPP, formatInputCurrency, formatValueToBRL, debounce, getTrendVisuals } from './utils.js';
 import { fetchPortfolioData, saveState } from './api.js';
-import { updateAssetCharts, updateHistoryChart, renderPlan, renderEmpty } from './charts.js';
+import { updateAssetCharts, updateHistoryChart, renderPlan, renderEmpty, calculatePeriodReturn } from './charts.js';
 import { addAporteRow, addBalanceRow, updateYearOptions, getAppState } from './ui.js';
 import { calculateState } from './calculations.js'; // Pure calculation
 
@@ -123,14 +123,50 @@ document.addEventListener('DOMContentLoaded', function () {
                 filterButtons.forEach(b => b.classList.remove('active'));
                 e.target.classList.add('active');
                 if (yearSelect) yearSelect.value = "";
+                // Clear custom period filter
+                fundEl.querySelector('.asset-chart-filters').dataset.customFilter = '';
+                fundEl.querySelector('.asset-custom-period-inputs').classList.add('hidden');
                 calculate();
             }
         });
         if (yearSelect) {
             yearSelect.onchange = () => {
                 filterButtons.forEach(b => b.classList.remove('active'));
+                fundEl.querySelector('.asset-custom-period-inputs').classList.add('hidden');
+                fundEl.querySelector('.asset-chart-filters').dataset.customFilter = '';
                 calculate();
             }
+        }
+
+        // Asset Custom Period Selector
+        const assetCustomPeriodBtn = fundEl.querySelector('.asset-custom-period-btn');
+        const assetCustomPeriodInputs = fundEl.querySelector('.asset-custom-period-inputs');
+        const assetApplyCustomPeriod = fundEl.querySelector('.asset-apply-custom-period');
+
+        if (assetCustomPeriodBtn && assetCustomPeriodInputs) {
+            assetCustomPeriodBtn.onclick = () => {
+                assetCustomPeriodInputs.classList.toggle('hidden');
+            };
+        }
+
+        if (assetApplyCustomPeriod) {
+            assetApplyCustomPeriod.onclick = () => {
+                const startDate = fundEl.querySelector('.asset-period-start').value;
+                const endDate = fundEl.querySelector('.asset-period-end').value;
+                if (startDate && endDate) {
+                    filterButtons.forEach(b => b.classList.remove('active'));
+                    if (yearSelect) yearSelect.value = "";
+                    fundEl.querySelector('.asset-chart-filters').dataset.customFilter = `CUSTOM:${startDate}:${endDate}`;
+                    assetCustomPeriodInputs.classList.add('hidden');
+                    calculate();
+                }
+            };
+        }
+
+        // Asset Show Invested Toggle
+        const assetShowInvestedToggle = fundEl.querySelector('.asset-show-invested');
+        if (assetShowInvestedToggle) {
+            assetShowInvestedToggle.onchange = () => calculate();
         }
 
         fundEl.querySelector('.add-aporte-btn').onclick = () => { addAporteRow(container, {}, debouncedCalculate); calculate(); };
@@ -198,10 +234,15 @@ document.addEventListener('DOMContentLoaded', function () {
         elements.totalValueDisplay.textContent = formatBRL(portfolioTotalValue);
         elements.totalInvestedGlobalDisplay.textContent = `Total Investido: ${formatBRL(portfolioTotalInvested)}`;
 
-        const grossReturnGlobal = portfolioTotalValue - portfolioTotalInvested;
-        const globalYield = portfolioTotalInvested > 0 ? grossReturnGlobal / portfolioTotalInvested : 0;
-        const trendGlobal = getTrendVisuals(grossReturnGlobal);
-        elements.totalReturnGlobalDisplay.innerHTML = `${trendGlobal.icon} ${formatBRL(grossReturnGlobal)} <span class="opacity-75 font-normal">(${formatPct(globalYield)})</span>`;
+        // Global Return Badge - using centralized function with synthetic points
+        // Start: equity=0, invested=0 | End: equity=portfolioTotalValue, invested=portfolioTotalInvested
+        const badgeNow = new Date();
+        const badgeStartDate = new Date(badgeNow.getTime() - 1); // 1ms before to ensure 2 distinct points
+        const badgeEquityPoints = [{ x: badgeStartDate, y: 0 }, { x: badgeNow, y: portfolioTotalValue }];
+        const badgeInvestedPoints = [{ x: badgeStartDate, y: 0 }, { x: badgeNow, y: portfolioTotalInvested }];
+        const { periodReturn: grossReturnGlobal, periodReturnPct: globalYield } = calculatePeriodReturn(badgeEquityPoints, badgeInvestedPoints);
+        const trendGlobal = getTrendVisuals(grossReturnGlobal || 0);
+        elements.totalReturnGlobalDisplay.innerHTML = `${trendGlobal.icon} ${formatBRL(grossReturnGlobal || 0)} <span class="opacity-75 font-normal">(${formatPct(globalYield || 0)})</span>`;
         elements.totalReturnGlobalDisplay.className = `flex justify-center items-center gap-1.5 text-xs font-bold mt-2 px-3 py-1 rounded-full border transition-all ${trendGlobal.color}`;
 
         // Global Risk
@@ -248,7 +289,13 @@ document.addEventListener('DOMContentLoaded', function () {
         if (globalYearSelect) updateYearOptions(globalYearSelect, uniqueYears, currentGlobalYear);
 
         let globalFilterType = globalYearSelect?.value;
-        if (!globalFilterType) globalFilterType = document.querySelector('#global-chart-filters .active')?.dataset.filter || 'MAX';
+        // Check for custom period filter first
+        const globalChartFilters = document.getElementById('global-chart-filters');
+        if (globalChartFilters?.dataset.customFilter) {
+            globalFilterType = globalChartFilters.dataset.customFilter;
+        } else if (!globalFilterType) {
+            globalFilterType = document.querySelector('#global-chart-filters .active')?.dataset.filter || 'MAX';
+        }
 
         // Update Global Chart
         // Need to reconstruct global Timeline logic if it wasn't returned perfectly or just use the aggregation logic
@@ -282,6 +329,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const globalEquityPoints = [];
         const globalInvestedPoints = [];
+
+        // Adicionar ponto inicial (0, 0) um dia antes do primeiro dado
+        // para que o cálculo de retorno considere o início real do portfólio
+        const dayBeforeMin = new Date(minDate);
+        dayBeforeMin.setDate(dayBeforeMin.getDate() - 1);
+        dayBeforeMin.setHours(23, 59, 59, 999);
+        globalEquityPoints.push({ x: dayBeforeMin, y: 0 });
+        globalInvestedPoints.push({ x: dayBeforeMin, y: 0 });
 
         denseDates.forEach(date => {
             let totalEquityAtDate = 0;
@@ -335,7 +390,25 @@ document.addEventListener('DOMContentLoaded', function () {
             globalInvestedPoints.push({ x: date, y: totalInvestedAtDate });
         });
 
-        updateHistoryChart(globalEquityPoints, globalInvestedPoints, portfolioTotalValue, globalFilterType);
+        // Read global show invested toggle state
+        const globalShowInvested = document.getElementById('global-show-invested')?.checked ?? true;
+        const chartResult = updateHistoryChart(globalEquityPoints, globalInvestedPoints, portfolioTotalValue, globalFilterType, 'historyChart', globalShowInvested);
+
+        // Update period return display
+        const periodReturnValueEl = document.getElementById('period-return-value');
+        if (periodReturnValueEl && chartResult) {
+            if (chartResult.periodReturnPct !== null) {
+                const returnPct = chartResult.periodReturnPct;
+                const returnBRL = chartResult.periodReturn;
+                const periodLabel = chartResult.periodLabel;
+                const isPositive = returnPct >= 0;
+                const colorClass = isPositive ? 'text-green-600' : 'text-red-600';
+                const sign = isPositive ? '+' : '';
+                periodReturnValueEl.innerHTML = `<span class="${colorClass}">${sign}${formatPct(returnPct)}</span> <span class="text-gray-400">(${periodLabel})</span>`;
+            } else {
+                periodReturnValueEl.textContent = '--';
+            }
+        }
 
         // Update Individual Assets UI
         calculatedAssets.forEach((asset, index) => {
@@ -377,12 +450,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 currentBar.className = "asset-current-bar h-full rounded-full transition-all duration-700 ease-out shadow-inner bg-indigo-400";
             }
 
-            // Update Return Badge
-            const grossReturn = asset.currentValue - asset.sumInvestedTotal;
-            const yieldPct = asset.sumInvestedTotal > 0 ? grossReturn / asset.sumInvestedTotal : 0;
-            const trend = getTrendVisuals(grossReturn);
+            // Update Return Badge - using centralized function with synthetic points
+            const assetBadgeNow = new Date();
+            const assetBadgeStart = new Date(assetBadgeNow.getTime() - 1);
+            const assetEquityPts = [{ x: assetBadgeStart, y: 0 }, { x: assetBadgeNow, y: asset.currentValue }];
+            const assetInvestedPts = [{ x: assetBadgeStart, y: 0 }, { x: assetBadgeNow, y: asset.sumInvestedTotal }];
+            const { periodReturn: grossReturn, periodReturnPct: yieldPct } = calculatePeriodReturn(assetEquityPts, assetInvestedPts);
+            const trend = getTrendVisuals(grossReturn || 0);
             const returnBadge = fundEl.querySelector('.asset-return-badge');
-            returnBadge.innerHTML = `${trend.icon} ${formatBRL(grossReturn)} (${formatPct(yieldPct)})`;
+            returnBadge.innerHTML = `${trend.icon} ${formatBRL(grossReturn || 0)} (${formatPct(yieldPct || 0)})`;
             returnBadge.className = `asset-return-badge text-[10px] font-bold px-2 py-0.5 rounded border flex items-center gap-1 shadow-sm transition-colors ${trend.color}`;
 
             // Update Variability (Risk) Badge
@@ -440,13 +516,36 @@ document.addEventListener('DOMContentLoaded', function () {
             if (assetSelect) updateYearOptions(assetSelect, uniqueYears, asset.assetFilterType);
 
             // Charts
+            const assetChartFilters = fundEl.querySelector('.asset-chart-filters');
             let assetFilterType = assetSelect ? assetSelect.value : '';
-            if (!assetFilterType) assetFilterType = fundEl.querySelector('.asset-chart-filters .active')?.dataset.filter || 'MAX';
+            // Check for custom period filter first
+            if (assetChartFilters?.dataset.customFilter) {
+                assetFilterType = assetChartFilters.dataset.customFilter;
+            } else if (!assetFilterType) {
+                assetFilterType = fundEl.querySelector('.asset-chart-filters .active')?.dataset.filter || 'MAX';
+            }
 
             if (fundEl.querySelector('.details-content').classList.contains('expanded')) {
                 // Usar dados expandidos (interpolação diária) para gráficos mais suaves
                 const chartBalancePoints = asset.balancePointsExpanded || asset.balancePoints;
-                updateAssetCharts(fundEl, asset.assetTimeline, asset.currentValue, chartBalancePoints, assetFilterType);
+                // Read asset show invested toggle state
+                const assetShowInvested = fundEl.querySelector('.asset-show-invested')?.checked ?? true;
+                const assetChartResult = updateAssetCharts(fundEl, asset.assetTimeline, asset.currentValue, chartBalancePoints, assetFilterType, assetShowInvested);
+
+                // Update asset period return display
+                const assetPeriodReturnEl = fundEl.querySelector('.asset-period-return');
+                if (assetPeriodReturnEl && assetChartResult) {
+                    if (assetChartResult.periodReturnPct !== null) {
+                        const returnPct = assetChartResult.periodReturnPct;
+                        const periodLabel = assetChartResult.periodLabel;
+                        const isPositive = returnPct >= 0;
+                        const colorClass = isPositive ? 'text-green-600' : 'text-red-600';
+                        const sign = isPositive ? '+' : '';
+                        assetPeriodReturnEl.innerHTML = `<span class="${colorClass}">${sign}${formatPct(returnPct)}</span> <span class="text-gray-400">(${periodLabel})</span>`;
+                    } else {
+                        assetPeriodReturnEl.textContent = '--';
+                    }
+                }
             }
         });
 
@@ -477,6 +576,9 @@ document.addEventListener('DOMContentLoaded', function () {
             document.querySelectorAll('#global-chart-filters .filter-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             document.getElementById('global-year-select').value = ""; // Reset year
+            // Clear custom period filter
+            document.getElementById('global-chart-filters').dataset.customFilter = '';
+            document.getElementById('global-custom-period-inputs').classList.add('hidden');
             triggerCalculate();
         };
     });
@@ -485,8 +587,43 @@ document.addEventListener('DOMContentLoaded', function () {
     if (globalYearSelect) {
         globalYearSelect.onchange = () => {
             document.querySelectorAll('#global-chart-filters .filter-btn').forEach(b => b.classList.remove('active')); // clear buttons
+            document.getElementById('global-chart-filters').dataset.customFilter = ''; // clear custom
+            document.getElementById('global-custom-period-inputs').classList.add('hidden');
             triggerCalculate();
         };
+    }
+
+    // Global Custom Period Selector
+    const globalCustomPeriodBtn = document.getElementById('global-custom-period-btn');
+    const globalCustomPeriodInputs = document.getElementById('global-custom-period-inputs');
+    const globalApplyCustomPeriod = document.getElementById('global-apply-custom-period');
+
+    if (globalCustomPeriodBtn && globalCustomPeriodInputs) {
+        globalCustomPeriodBtn.onclick = () => {
+            globalCustomPeriodInputs.classList.toggle('hidden');
+        };
+    }
+
+    if (globalApplyCustomPeriod) {
+        globalApplyCustomPeriod.onclick = () => {
+            const startDate = document.getElementById('global-period-start').value;
+            const endDate = document.getElementById('global-period-end').value;
+            if (startDate && endDate) {
+                // Clear other filters
+                document.querySelectorAll('#global-chart-filters .filter-btn').forEach(b => b.classList.remove('active'));
+                document.getElementById('global-year-select').value = "";
+                // Store custom filter in a data attribute
+                document.getElementById('global-chart-filters').dataset.customFilter = `CUSTOM:${startDate}:${endDate}`;
+                globalCustomPeriodInputs.classList.add('hidden');
+                triggerCalculate();
+            }
+        };
+    }
+
+    // Global Show Invested Toggle
+    const globalShowInvestedToggle = document.getElementById('global-show-invested');
+    if (globalShowInvestedToggle) {
+        globalShowInvestedToggle.onchange = () => triggerCalculate();
     }
 
     // Initial Load

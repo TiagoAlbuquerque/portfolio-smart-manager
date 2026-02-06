@@ -1,12 +1,71 @@
 import { formatBRL, formatPct, getTrendVisuals, formatPP } from './utils.js';
 
-export const updateAssetCharts = (fundEl, timeline, currentValue, balancePoints = [], filterType) => {
+/**
+ * Calcula o retorno percentual de um período com base nos dados de patrimônio e investido.
+ * 
+ * Fórmula única: Retorno = Patrimônio Final / (Patrimônio Início + Aportes no Período) - 1
+ * 
+ * Esta fórmula é usada em TODOS os contextos de cálculo de retorno na aplicação.
+ * 
+ * @param {Array} equityData - Array de pontos {x: Date, y: number} do patrimônio
+ * @param {Array} investedData - Array de pontos {x: Date, y: number} do investido
+ * @returns {Object} { periodReturnPct, periodReturn, periodLabel }
+ */
+export const calculatePeriodReturn = (equityData, investedData) => {
+    const result = { periodReturnPct: null, periodReturn: null, periodLabel: '' };
+
+    if (!equityData || !investedData || equityData.length < 2 || investedData.length < 2) {
+        return result;
+    }
+
+    const startEquity = equityData[0].y;
+    const endEquity = equityData[equityData.length - 1].y;
+    const startInvested = investedData[0].y;
+    const endInvested = investedData[investedData.length - 1].y;
+
+    // Fórmula única: Retorno = Final / (Início + Aportes) - 1
+    const contributionsDuringPeriod = endInvested - startInvested;
+    const base = startEquity + contributionsDuringPeriod;
+
+    if (base > 0) {
+        result.periodReturnPct = (endEquity / base) - 1;
+        result.periodReturn = endEquity - base;
+    }
+
+    // Calcula label do período
+    const startDate = equityData[0].x;
+    const endDate = equityData[equityData.length - 1].x;
+    const diffMs = endDate - startDate;
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+    if (diffDays <= 31) {
+        result.periodLabel = `${diffDays}d`;
+    } else if (diffDays <= 365) {
+        result.periodLabel = `${Math.round(diffDays / 30)}m`;
+    } else {
+        result.periodLabel = `${(diffDays / 365).toFixed(1)}a`;
+    }
+
+    return result;
+};
+
+export const updateAssetCharts = (fundEl, timeline, currentValue, balancePoints = [], filterType, showInvested = true) => {
     const lineCanvas = fundEl.querySelector('.asset-line-canvas');
     if (Chart.getChart(lineCanvas)) Chart.getChart(lineCanvas).destroy();
     const sorted = [...timeline].sort((a, b) => a.date - b.date);
     const points = [];
     const investedPoints = [];
     const now = new Date();
+
+    // Adicionar ponto inicial (0, 0) antes do primeiro aporte
+    // para que o cálculo de retorno considere o início real do ativo
+    if (sorted.length > 0) {
+        const dayBeforeFirst = new Date(sorted[0].date);
+        dayBeforeFirst.setDate(dayBeforeFirst.getDate() - 1);
+        dayBeforeFirst.setHours(23, 59, 59, 999);
+        points.push({ x: dayBeforeFirst, y: 0 });
+        investedPoints.push({ x: dayBeforeFirst, y: 0 });
+    }
 
     // Build Invested Line (Step Function)
     sorted.forEach((event, index) => {
@@ -51,33 +110,40 @@ export const updateAssetCharts = (fundEl, timeline, currentValue, balancePoints 
     const filteredPoints = filterDataByPeriod(points, filterType);
     const filteredInvestedPoints = filterDataByPeriod(investedPoints, filterType);
 
+    // Calculate period return using centralized function
+    const { periodReturnPct, periodLabel } = calculatePeriodReturn(filteredPoints, filteredInvestedPoints);
+
+    // Build datasets array conditionally
+    const datasets = [
+        {
+            label: 'Patrimônio',
+            data: filteredPoints,
+            borderColor: '#4338ca',
+            backgroundColor: 'rgba(67, 56, 202, 0.05)',
+            fill: true,
+            tension: 0.5,
+            pointRadius: 0.8,
+            borderWidth: 0.9
+        }   
+    ];
+
+    if (showInvested) {
+        datasets.push({
+            label: 'Investido',
+            data: filteredInvestedPoints,
+            borderColor: '#94a3b8',
+            backgroundColor: 'transparent',
+            fill: false,
+            tension: 0,
+            pointRadius: 0,
+            borderWidth: 0.5,
+            borderDash: [5, 5]
+        });
+    }
+
     new Chart(lineCanvas, {
         type: 'line',
-        data: {
-            datasets: [
-                {
-                    label: 'Patrimônio',
-                    data: filteredPoints,
-                    borderColor: '#4338ca',
-                    backgroundColor: 'rgba(67, 56, 202, 0.05)',
-                    fill: true,
-                    tension: 0.1,
-                    pointRadius: 1,
-                    borderWidth: 2
-                },
-                {
-                    label: 'Investido',
-                    data: filteredInvestedPoints,
-                    borderColor: '#94a3b8',
-                    backgroundColor: 'transparent',
-                    fill: false,
-                    tension: 0,
-                    pointRadius: 0,
-                    borderWidth: 1,
-                    borderDash: [5, 5]
-                }
-            ]
-        },
+        data: { datasets },
         options: {
             responsive: true,
             maintainAspectRatio: false,
@@ -90,42 +156,51 @@ export const updateAssetCharts = (fundEl, timeline, currentValue, balancePoints 
             }
         }
     });
+
+    return { periodReturnPct, periodLabel };
 };
 
-export const updateHistoryChart = (equityData, investedData, currentVal, filterType, canvasId = 'historyChart') => {
+export const updateHistoryChart = (equityData, investedData, currentVal, filterType, canvasId = 'historyChart', showInvested = true) => {
     const canvas = document.getElementById(canvasId);
-    if (!canvas) return;
+    if (!canvas) return { periodReturn: null, periodReturnPct: null };
     if (Chart.getChart(canvas)) Chart.getChart(canvas).destroy();
 
     const filteredEquityData = filterDataByPeriod(equityData, filterType);
     const filteredInvestedData = filterDataByPeriod(investedData, filterType);
 
+    // Calculate period return using centralized function
+    const { periodReturnPct, periodReturn, periodLabel } = calculatePeriodReturn(filteredEquityData, filteredInvestedData);
+
+    // Build datasets array conditionally
+    const datasets = [
+        {
+            label: 'Patrimônio Total',
+            data: filteredEquityData,
+            borderColor: '#4338ca',
+            fill: true,
+            tension: 0.5,
+            pointRadius: 0.8,
+            borderWidth: 0.9,
+            backgroundColor: 'rgba(67, 56, 202, 0.1)'
+        }
+    ];
+
+    if (showInvested) {
+        datasets.push({
+            label: 'Total Investido',
+            data: filteredInvestedData,
+            borderColor: '#9ca3af',
+            fill: false,
+            tension: 0,
+            pointRadius: 0,
+            borderWidth: 0.5,
+            borderDash: [5, 5]
+        });
+    }
+
     new Chart(canvas, {
         type: 'line',
-        data: {
-            datasets: [
-                {
-                    label: 'Patrimônio Total',
-                    data: filteredEquityData,
-                    borderColor: '#4338ca',
-                    fill: true,
-                    tension: 0.1,
-                    pointRadius: 1,
-                    borderWidth: 3,
-                    backgroundColor: 'rgba(67, 56, 202, 0.1)'
-                },
-                {
-                    label: 'Total Investido',
-                    data: filteredInvestedData,
-                    borderColor: '#9ca3af',
-                    fill: false,
-                    tension: 0,
-                    pointRadius: 0,
-                    borderWidth: 2,
-                    borderDash: [5, 5]
-                }
-            ]
-        },
+        data: { datasets },
         options: {
             responsive: true,
             maintainAspectRatio: false,
@@ -138,6 +213,8 @@ export const updateHistoryChart = (equityData, investedData, currentVal, filterT
             }
         }
     });
+
+    return { periodReturn, periodReturnPct, periodLabel };
 };
 
 export const renderAllocationChart = (canvasId, labels, values) => {
@@ -204,16 +281,31 @@ const filterDataByPeriod = (data, filterType) => {
     if (!data || data.length === 0) return data;
     if (filterType === 'MAX') return data;
 
+    // Filtro por ano específico (ex: "2025")
     if (/^\d{4}$/.test(filterType)) {
         const year = parseInt(filterType);
         return data.filter(point => point.x.getFullYear() === year);
     }
 
+    // Período personalizado: CUSTOM:YYYY-MM-DD:YYYY-MM-DD
+    if (filterType && filterType.startsWith('CUSTOM:')) {
+        const parts = filterType.split(':');
+        if (parts.length === 3) {
+            const startDate = new Date(parts[1]);
+            const endDate = new Date(parts[2]);
+            startDate.setHours(0, 0, 0, 0);
+            endDate.setHours(23, 59, 59, 999);
+            return data.filter(point => point.x >= startDate && point.x <= endDate);
+        }
+    }
+
     const now = new Date();
     let cutoffDate = new Date();
 
-    if (filterType === '12M') {
-        cutoffDate.setFullYear(now.getFullYear() - 1);
+    // Filtros por mês: 1M, 2M, 3M, 6M, 12M
+    const monthFilters = { '1M': 1, '2M': 2, '3M': 3, '6M': 6, '12M': 12 };
+    if (monthFilters[filterType]) {
+        cutoffDate.setMonth(now.getMonth() - monthFilters[filterType]);
     } else if (filterType === 'YTD') {
         cutoffDate = new Date(now.getFullYear(), 0, 1);
     }
