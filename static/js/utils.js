@@ -2,6 +2,15 @@ export const formatBRL = (v) => v.toLocaleString('pt-BR', { style: 'currency', c
 export const formatPct = (v) => `${(v * 100).toFixed(2)}%`.replace('.', ',');
 export const formatPP = (v) => `${(v * 100).toFixed(3)} pp/sem`.replace('.', ',');
 
+export const formatTimeFromWeeks = (weeks) => {
+    if (!weeks || weeks <= 0 || !isFinite(weeks)) return "--";
+    const years = Math.floor(weeks / 52);
+    const months = Math.round((weeks % 52) / 4.33);
+    if (years === 0) return `${months}m`;
+    if (months === 0) return `${years}a`;
+    return `${years}a ${months}m`;
+};
+
 export const getTrendVisuals = (val) => {
     if (val > 0) return { color: 'text-emerald-600 bg-emerald-50 border-emerald-100', icon: '▲' };
     if (val < 0) return { color: 'text-rose-600 bg-rose-50 border-rose-100', icon: '▼' };

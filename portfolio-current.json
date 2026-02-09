@@ -372,7 +372,7 @@
       "name": "Trend Prata FIM RL",
       "enabled": true,
       "target": "0",
-      "expanded": true,
+      "expanded": false,
       "id": "fund-2gyg0dao8",
       "aportes": [
         {

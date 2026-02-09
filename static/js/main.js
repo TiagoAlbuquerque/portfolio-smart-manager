@@ -1,4 +1,4 @@
-import { formatBRL, formatPct, formatPP, formatInputCurrency, formatValueToBRL, debounce, getTrendVisuals } from './utils.js';
+import { formatBRL, formatPct, formatPP, formatInputCurrency, formatValueToBRL, debounce, getTrendVisuals, formatTimeFromWeeks } from './utils.js';
 import { fetchPortfolioData, saveState } from './api.js';
 import { updateAssetCharts, updateHistoryChart, renderPlan, renderEmpty, calculatePeriodReturn } from './charts.js';
 import { addAporteRow, addBalanceRow, updateYearOptions, getAppState } from './ui.js';
@@ -278,6 +278,26 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('global-after-first-speed').textContent = formatPP(calcImpliedSpeed(portfolioTotalValue + capital, globalAfter_First[24], 104));
         document.getElementById('global-after-last-speed').textContent = formatPP(calcImpliedSpeed(portfolioTotalValue + capital, globalAfter_Last[24], 104));
 
+        // Update Global TTM (Time to Million)
+        const updateTTM = (id, value, weeklyRate) => {
+            const el = document.getElementById(id);
+            if (el) {
+                if (value >= 1000000) {
+                    el.textContent = "Atingido! 🎉";
+                } else if (weeklyRate > 0 && value > 0) {
+                    const weeks = Math.log(1000000 / value) / Math.log(1 + weeklyRate);
+                    el.textContent = formatTimeFromWeeks(weeks);
+                } else {
+                    el.textContent = "--";
+                }
+            }
+        };
+
+        updateTTM('cur-first-ttm', portfolioTotalValue, globalHistoricalSpeed);
+        updateTTM('cur-last-ttm', portfolioTotalValue, globalRecentSpeed);
+        updateTTM('after-first-ttm', portfolioTotalValue + capital, calcImpliedSpeed(portfolioTotalValue + capital, globalAfter_First[24], 104));
+        updateTTM('after-last-ttm', portfolioTotalValue + capital, calcImpliedSpeed(portfolioTotalValue + capital, globalAfter_Last[24], 104));
+
         // Update Year Dropdowns (Global)
         const uniqueYears = Array.from(results.allDatesSet)
             .map(t => new Date(t).getFullYear())
@@ -510,6 +530,30 @@ document.addEventListener('DOMContentLoaded', function () {
             fundEl.querySelector('.proj-12-last').textContent = formatBRL(proj.last[12]);
             fundEl.querySelector('.proj-24-first').textContent = formatBRL(proj.first[24]);
             fundEl.querySelector('.proj-24-last').textContent = formatBRL(proj.last[24]);
+
+            // Update Asset TTM (Time to Million)
+            const ttmFirstEl = fundEl.querySelector('.proj-ttm-first');
+            const ttmLastEl = fundEl.querySelector('.proj-ttm-last');
+            if (ttmFirstEl) {
+                if (asset.currentValue >= 1000000) {
+                    ttmFirstEl.textContent = "Atingido! 🎉";
+                } else if (asset.rwFirst > 0) {
+                    const weeks = Math.log(1000000 / asset.currentValue) / Math.log(1 + asset.rwFirst);
+                    ttmFirstEl.textContent = formatTimeFromWeeks(weeks);
+                } else {
+                    ttmFirstEl.textContent = "--";
+                }
+            }
+            if (ttmLastEl) {
+                if (asset.currentValue >= 1000000) {
+                    ttmLastEl.textContent = "Atingido! 🎉";
+                } else if (asset.rwLast > 0) {
+                    const weeks = Math.log(1000000 / asset.currentValue) / Math.log(1 + asset.rwLast);
+                    ttmLastEl.textContent = formatTimeFromWeeks(weeks);
+                } else {
+                    ttmLastEl.textContent = "--";
+                }
+            }
 
             // Update Dropdown
             const assetSelect = fundEl.querySelector('.asset-year-select');
