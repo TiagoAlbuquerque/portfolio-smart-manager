@@ -4,12 +4,12 @@
       "name": "Trend Ouro FIF Multi RL",
       "enabled": true,
       "target": "0",
-      "expanded": false,
+      "expanded": true,
       "id": "fund-yntng75hx",
       "aportes": [
         {
           "value": "980,58",
-          "return": "78,57",
+          "return": "53,67",
           "date": "2026-01-16"
         },
         {
@@ -29,11 +29,15 @@
         },
         {
           "value": "1.370,89",
-          "return": "1.333,63",
+          "return": "1.270,05",
           "date": "2025-01-14"
         }
       ],
       "balances": [
+        {
+          "date": "2026-02-05",
+          "value": "10.256,82"
+        },
         {
           "date": "2026-02-04",
           "value": "10.473,25"
@@ -157,7 +161,7 @@
       "aportes": [
         {
           "value": "1.036,16",
-          "return": "53,09",
+          "return": "29,97",
           "date": "2026-01-16"
         },
         {
@@ -177,11 +181,15 @@
         },
         {
           "value": "970,62",
-          "return": "560,72",
+          "return": "528,21",
           "date": "2025-01-14"
         }
       ],
       "balances": [
+        {
+          "date": "2026-02-05",
+          "value": "5.936,13"
+        },
         {
           "date": "2026-02-04",
           "value": "6.067,24"
@@ -289,11 +297,15 @@
       "aportes": [
         {
           "value": "55,65",
-          "return": "4,09",
+          "return": "4,13",
           "date": "2025-08-05"
         }
       ],
       "balances": [
+        {
+          "date": "2026-02-06",
+          "value": "59,78"
+        },
         {
           "date": "2026-02-05",
           "value": "59,74"
@@ -360,16 +372,20 @@
       "name": "Trend Prata FIM RL",
       "enabled": true,
       "target": "0",
-      "expanded": false,
+      "expanded": true,
       "id": "fund-2gyg0dao8",
       "aportes": [
         {
           "value": "500",
-          "return": "-29,82",
+          "return": "-83,41",
           "date": "2026-01-16"
         }
       ],
       "balances": [
+        {
+          "date": "2026-02-05",
+          "value": "416,59"
+        },
         {
           "date": "2026-02-04",
           "value": "470,18"
@@ -400,16 +416,20 @@
       "name": "JPM China Equity Advisory CIA IE RL",
       "enabled": true,
       "target": "0",
-      "expanded": true,
+      "expanded": false,
       "id": "fund-smk7u467h",
       "aportes": [
         {
           "value": "500,00",
-          "return": "5,02",
+          "return": "1,10",
           "date": "2026-02-02"
         }
       ],
       "balances": [
+        {
+          "date": "2026-02-05",
+          "value": "501,10"
+        },
         {
           "date": "2026-02-04",
           "value": "505,02"
@@ -425,16 +445,20 @@
       "aportes": [
         {
           "value": "100",
-          "return": "-19,86",
+          "return": "-30,20",
           "date": "2026-01-16"
         },
         {
           "value": "500",
-          "return": "-183,35",
+          "return": "-224,19",
           "date": "2025-01-14"
         }
       ],
       "balances": [
+        {
+          "date": "2026-02-05",
+          "value": "345,61"
+        },
         {
           "date": "2026-02-04",
           "value": "396,79"
@@ -587,33 +611,37 @@
     },
     {
       "name": "Absolute Creta Advisory FIF FIRF",
-      "enabled": true,
+      "enabled": false,
       "target": "0",
       "expanded": false,
       "id": "fund-s75fij7wc",
       "aportes": [
         {
           "value": "137,10",
-          "return": "4,80",
+          "return": "4,28",
           "date": "2025-11-05"
         },
         {
           "value": "826,23",
-          "return": "55,99",
+          "return": "52,79",
           "date": "2025-08-15"
         },
         {
           "value": "633,66",
-          "return": "82,53",
+          "return": "79,94",
           "date": "2025-03-24"
         },
         {
           "value": "1.865,64",
-          "return": "304,99",
+          "return": "297,13",
           "date": "2025-01-14"
         }
       ],
       "balances": [
+        {
+          "date": "2026-02-05",
+          "value": "3.896,77"
+        },
         {
           "date": "2026-02-04",
           "value": "3.910,94"
@@ -710,26 +738,30 @@
     },
     {
       "name": "ARX Fuji FIC RF CP RL",
-      "enabled": true,
+      "enabled": false,
       "target": "0",
       "expanded": false,
       "id": "fund-0rqdj300h",
       "aportes": [
         {
           "value": "994,18",
-          "return": "67,28",
+          "return": "68,45",
           "date": "2025-08-18"
         },
         {
           "value": "1.964,53",
-          "return": "314,53",
+          "return": "317,04",
           "date": "2025-01-14"
         }
       ],
       "balances": [
         {
           "date": "2026-02-05",
-          "value": "3.342,35"
+          "value": "3.344,20"
+        },
+        {
+          "date": "2026-02-04",
+          "value": "3.342,02"
         },
         {
           "date": "2026-02-03",
@@ -822,11 +854,15 @@
       "aportes": [
         {
           "value": "1.993,11",
-          "return": "357,19",
+          "return": "358,74",
           "date": "2025-01-14"
         }
       ],
       "balances": [
+        {
+          "date": "2026-02-06",
+          "value": "2.351,85"
+        },
         {
           "date": "2026-02-05",
           "value": "2.350,30"
@@ -898,11 +934,15 @@
       "aportes": [
         {
           "value": "543,43",
-          "return": "3,66",
+          "return": "3,96",
           "date": "2026-01-16"
         }
       ],
       "balances": [
+        {
+          "date": "2026-02-06",
+          "value": "547,39"
+        },
         {
           "date": "2026-02-05",
           "value": "547,09"
@@ -970,11 +1010,19 @@
       "aportes": [
         {
           "value": "10000",
-          "return": "687,57",
+          "return": "715,88",
           "date": "2025-09-14"
         }
       ],
       "balances": [
+        {
+          "date": "2026-02-07",
+          "value": "10.715,88"
+        },
+        {
+          "date": "2026-02-05",
+          "value": "10.708,80"
+        },
         {
           "date": "2026-02-04",
           "value": "10.701,72"

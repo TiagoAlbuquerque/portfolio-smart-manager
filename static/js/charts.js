@@ -49,6 +49,87 @@ export const calculatePeriodReturn = (equityData, investedData) => {
     return result;
 };
 
+
+// HELPER: Get value at a specific date
+const getValueAtDate = (data, date, method = 'LINEAR') => {
+    if (!data || data.length === 0) return 0;
+
+    // Sort check if needed, but assuming data is sorted by caller
+    if (date < data[0].x) return 0;
+    if (date >= data[data.length - 1].x) return data[data.length - 1].y;
+
+    for (let i = 0; i < data.length - 1; i++) {
+        const p1 = data[i];
+        const p2 = data[i + 1];
+
+        // Skip vertical segments (same time points) e.g. in step functions
+        if (p2.x.getTime() <= p1.x.getTime()) continue;
+
+        if (date >= p1.x && date < p2.x) {
+            if (method === 'STEP') return p1.y;
+            // LINEAR
+            const tTotal = p2.x.getTime() - p1.x.getTime();
+            const tElapsed = date.getTime() - p1.x.getTime();
+            return p1.y + (p2.y - p1.y) * (tElapsed / tTotal);
+        }
+    }
+    return data[data.length - 1].y;
+};
+
+// HELPER: Filter data and ensure start point exists
+const filterAndNormalizeData = (data, filterType, method = 'LINEAR') => {
+    if (!data || data.length === 0) return [];
+    if (filterType === 'MAX') return data;
+
+    let startDate;
+    let endDate = new Date();
+    endDate.setHours(23, 59, 59, 999);
+
+    const now = new Date();
+
+    // Determine Start Date
+    if (/^\d{4}$/.test(filterType)) {
+        const year = parseInt(filterType);
+        startDate = new Date(year, 0, 1);
+        endDate = new Date(year, 11, 31, 23, 59, 59);
+    } else if (filterType && filterType.startsWith('CUSTOM:')) {
+        const parts = filterType.split(':');
+        if (parts.length === 3) {
+            startDate = new Date(parts[1]);
+            endDate = new Date(parts[2]);
+            startDate.setHours(0, 0, 0, 0);
+            endDate.setHours(23, 59, 59, 999);
+        }
+    } else {
+        // Relative filters
+        startDate = new Date();
+        startDate.setHours(0, 0, 0, 0); // Start of that day
+        const monthFilters = { '1M': 1, '2M': 2, '3M': 3, '6M': 6, '12M': 12 };
+        if (monthFilters[filterType]) {
+            startDate.setMonth(now.getMonth() - monthFilters[filterType]);
+        } else if (filterType === 'YTD') {
+            startDate = new Date(now.getFullYear(), 0, 1);
+        } else {
+            return data; // Should not happen or Fallback
+        }
+    }
+
+    // 1. Calculate value at exact start
+    const valAtStart = getValueAtDate(data, startDate, method);
+    const startPoint = { x: new Date(startDate), y: valAtStart };
+
+    // 2. Filter points strictly inside the range
+    const insidePoints = data.filter(d => d.x > startDate && d.x <= endDate);
+
+    // 3. Construct new array
+    const result = [startPoint, ...insidePoints];
+
+    // Optional: Ensure end point if range extends beyond data? 
+    // For now, taking the last inside point or the start point is sufficient for the span.
+
+    return result;
+}
+
 export const updateAssetCharts = (fundEl, timeline, currentValue, balancePoints = [], filterType, showInvested = true) => {
     const lineCanvas = fundEl.querySelector('.asset-line-canvas');
     if (Chart.getChart(lineCanvas)) Chart.getChart(lineCanvas).destroy();
@@ -58,7 +139,6 @@ export const updateAssetCharts = (fundEl, timeline, currentValue, balancePoints 
     const now = new Date();
 
     // Adicionar ponto inicial (0, 0) antes do primeiro aporte
-    // para que o cálculo de retorno considere o início real do ativo
     if (sorted.length > 0) {
         const dayBeforeFirst = new Date(sorted[0].date);
         dayBeforeFirst.setDate(dayBeforeFirst.getDate() - 1);
@@ -107,8 +187,9 @@ export const updateAssetCharts = (fundEl, timeline, currentValue, balancePoints 
         if (points.length > 0) points.push({ x: now, y: currentValue });
     }
 
-    const filteredPoints = filterDataByPeriod(points, filterType);
-    const filteredInvestedPoints = filterDataByPeriod(investedPoints, filterType);
+    // Use NEW filtering logic
+    const filteredPoints = filterAndNormalizeData(points, filterType, 'LINEAR');
+    const filteredInvestedPoints = filterAndNormalizeData(investedPoints, filterType, 'STEP');
 
     // Calculate period return using centralized function
     const { periodReturnPct, periodLabel } = calculatePeriodReturn(filteredPoints, filteredInvestedPoints);
@@ -124,7 +205,7 @@ export const updateAssetCharts = (fundEl, timeline, currentValue, balancePoints 
             tension: 0.5,
             pointRadius: 0.8,
             borderWidth: 0.9
-        }   
+        }
     ];
 
     if (showInvested) {
@@ -165,8 +246,9 @@ export const updateHistoryChart = (equityData, investedData, currentVal, filterT
     if (!canvas) return { periodReturn: null, periodReturnPct: null };
     if (Chart.getChart(canvas)) Chart.getChart(canvas).destroy();
 
-    const filteredEquityData = filterDataByPeriod(equityData, filterType);
-    const filteredInvestedData = filterDataByPeriod(investedData, filterType);
+    // Use NEW filtering logic
+    const filteredEquityData = filterAndNormalizeData(equityData, filterType, 'LINEAR');
+    const filteredInvestedData = filterAndNormalizeData(investedData, filterType, 'STEP');
 
     // Calculate period return using centralized function
     const { periodReturnPct, periodReturn, periodLabel } = calculatePeriodReturn(filteredEquityData, filteredInvestedData);
@@ -274,41 +356,4 @@ export const renderPlan = (data, capital, benchmarkSemanal, elements) => {
 export const renderEmpty = (elements) => {
     if (elements.actionPlan) elements.actionPlan.innerHTML = "";
     if (elements.resultsSummary) elements.resultsSummary.innerHTML = `<div class="p-8 text-center text-gray-300 text-xs italic">Aguardando dados...</div>`;
-};
-
-// Helper for charts
-const filterDataByPeriod = (data, filterType) => {
-    if (!data || data.length === 0) return data;
-    if (filterType === 'MAX') return data;
-
-    // Filtro por ano específico (ex: "2025")
-    if (/^\d{4}$/.test(filterType)) {
-        const year = parseInt(filterType);
-        return data.filter(point => point.x.getFullYear() === year);
-    }
-
-    // Período personalizado: CUSTOM:YYYY-MM-DD:YYYY-MM-DD
-    if (filterType && filterType.startsWith('CUSTOM:')) {
-        const parts = filterType.split(':');
-        if (parts.length === 3) {
-            const startDate = new Date(parts[1]);
-            const endDate = new Date(parts[2]);
-            startDate.setHours(0, 0, 0, 0);
-            endDate.setHours(23, 59, 59, 999);
-            return data.filter(point => point.x >= startDate && point.x <= endDate);
-        }
-    }
-
-    const now = new Date();
-    let cutoffDate = new Date();
-
-    // Filtros por mês: 1M, 2M, 3M, 6M, 12M
-    const monthFilters = { '1M': 1, '2M': 2, '3M': 3, '6M': 6, '12M': 12 };
-    if (monthFilters[filterType]) {
-        cutoffDate.setMonth(now.getMonth() - monthFilters[filterType]);
-    } else if (filterType === 'YTD') {
-        cutoffDate = new Date(now.getFullYear(), 0, 1);
-    }
-
-    return data.filter(point => point.x >= cutoffDate);
 };

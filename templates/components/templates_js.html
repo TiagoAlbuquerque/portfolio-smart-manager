@@ -146,7 +146,7 @@
                         <div class="flex items-center gap-2">
                             <div class="asset-chart-filters flex gap-1 items-center flex-wrap">
                                 <button data-filter="1M"
-                                    class="filter-btn text-[8px] font-bold text-gray-400 bg-white border border-gray-100 px-1.5 py-0.5 rounded hover:bg-gray-50 transition-colors">1M</button>
+                                    class="filter-btn active text-[8px] font-bold text-gray-400 bg-white border border-gray-100 px-1.5 py-0.5 rounded hover:bg-gray-50 transition-colors">1M</button>
                                 <button data-filter="2M"
                                     class="filter-btn text-[8px] font-bold text-gray-400 bg-white border border-gray-100 px-1.5 py-0.5 rounded hover:bg-gray-50 transition-colors">2M</button>
                                 <button data-filter="3M"
@@ -158,7 +158,7 @@
                                 <button data-filter="YTD"
                                     class="filter-btn text-[8px] font-bold text-gray-400 bg-white border border-gray-100 px-1.5 py-0.5 rounded hover:bg-gray-50 transition-colors">YTD</button>
                                 <button data-filter="MAX"
-                                    class="filter-btn active text-[8px] font-bold text-gray-400 bg-white border border-gray-100 px-1.5 py-0.5 rounded hover:bg-gray-50 transition-colors">Máx</button>
+                                    class="filter-btn text-[8px] font-bold text-gray-400 bg-white border border-gray-100 px-1.5 py-0.5 rounded hover:bg-gray-50 transition-colors">Máx</button>
                                 <div class="w-px h-3 bg-gray-100 mx-0.5"></div>
                                 <select
                                     class="asset-year-select text-[8px] font-bold text-gray-400 bg-white border border-gray-100 px-1 py-0.5 rounded hover:bg-gray-50 transition-colors outline-none cursor-pointer">
@@ -186,7 +186,7 @@
                             class="flex items-center gap-1 cursor-pointer text-gray-400 hover:text-gray-600 transition-colors">
                             <input type="checkbox"
                                 class="asset-show-invested w-3 h-3 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
-                                checked>
+                                unchecked>
                             <span>Investido</span>
                         </label>
                         <div class="flex items-center gap-2">
@@ -194,9 +194,8 @@
                             <span class="asset-period-return text-indigo-600">--</span>
                         </div>
                     </div>
-                    <div class="relative w-full h-52 overflow-hidden">
-                        <canvas class="asset-line-canvas absolute inset-0 w-full h-full"
-                            style="max-height: 100%;"></canvas>
+                    <div class="relative w-full h-[200px] overflow-hidden">
+                        <canvas class="asset-line-canvas absolute inset-0 w-full h-full"></canvas>
                     </div>
                 </div>
 

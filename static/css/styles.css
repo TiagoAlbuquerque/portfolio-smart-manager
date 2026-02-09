@@ -14,12 +14,18 @@ body {
     position: relative;
     height: 150px;
     width: 100%;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
 }
 
 .asset-line-container {
     position: relative;
-    height: 220px;
+    min-height: 220px;
     width: 100%;
+}
+
+.asset-line-container canvas {
+    max-height: 200px;
 }
 
 input[type="date"]::-webkit-calendar-picker-indicator {
@@ -191,8 +197,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 /* Container de seção */
 .section-card {
     background-color: white;
-    padding: 1.5rem;
-    border-radius: 1rem;
+    padding: 1rem;
+    border-radius: 0.75rem;
     box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
     border: 1px solid rgb(243 244 246);
 }
