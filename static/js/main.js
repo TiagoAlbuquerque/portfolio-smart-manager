@@ -298,6 +298,10 @@ document.addEventListener('DOMContentLoaded', function () {
         updateTTM('after-first-ttm', portfolioTotalValue + capital, calcImpliedSpeed(portfolioTotalValue + capital, globalAfter_First[24], 104));
         updateTTM('after-last-ttm', portfolioTotalValue + capital, calcImpliedSpeed(portfolioTotalValue + capital, globalAfter_Last[24], 104));
 
+        // Update TTM Benchmark (using CDI weekly rate)
+        updateTTM('cur-benchmark-ttm', portfolioTotalValue, benchmarkSemanal);
+        updateTTM('after-benchmark-ttm', portfolioTotalValue + capital, benchmarkSemanal);
+
         // Update Year Dropdowns (Global)
         const uniqueYears = Array.from(results.allDatesSet)
             .map(t => new Date(t).getFullYear())
