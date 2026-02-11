@@ -4,12 +4,12 @@
       "name": "Trend Ouro FIF Multi RL",
       "enabled": true,
       "target": "0",
-      "expanded": false,
+      "expanded": true,
       "id": "fund-yntng75hx",
       "aportes": [
         {
           "value": "980,58",
-          "return": "81,31",
+          "return": "108,07",
           "date": "2026-01-16"
         },
         {
@@ -29,11 +29,19 @@
         },
         {
           "value": "1.370,89",
-          "return": "1.340,63",
+          "return": "1.408,95",
           "date": "2025-01-14"
         }
       ],
       "balances": [
+        {
+          "date": "2026-02-10",
+          "value": "10.674,75"
+        },
+        {
+          "date": "2026-02-09",
+          "value": "10.796,27"
+        },
         {
           "date": "2026-02-06",
           "value": "10.530,93"
@@ -165,7 +173,7 @@
       "aportes": [
         {
           "value": "1.036,16",
-          "return": "50,35",
+          "return": "72,93",
           "date": "2026-01-16"
         },
         {
@@ -185,11 +193,19 @@
         },
         {
           "value": "970,62",
-          "return": "556,86",
+          "return": "588,60",
           "date": "2025-01-14"
         }
       ],
       "balances": [
+        {
+          "date": "2026-02-10",
+          "value": "6.114,84"
+        },
+        {
+          "date": "2026-02-09",
+          "value": "6.175,31"
+        },
         {
           "date": "2026-02-06",
           "value": "6.049,60"
@@ -305,11 +321,15 @@
       "aportes": [
         {
           "value": "55,65",
-          "return": "4,16",
+          "return": "4,19",
           "date": "2025-08-05"
         }
       ],
       "balances": [
+        {
+          "date": "2026-02-10",
+          "value": "59,84"
+        },
         {
           "date": "2026-02-09",
           "value": "59,81"
@@ -389,11 +409,19 @@
       "aportes": [
         {
           "value": "500",
-          "return": "-70,11",
+          "return": "-41,74",
           "date": "2026-01-16"
         }
       ],
       "balances": [
+        {
+          "date": "2026-02-10",
+          "value": "446,31"
+        },
+        {
+          "date": "2026-02-09",
+          "value": "458,26"
+        },
         {
           "date": "2026-02-06",
           "value": "429,89"
@@ -437,11 +465,19 @@
       "aportes": [
         {
           "value": "500,00",
-          "return": "-1,71",
+          "return": "10,36",
           "date": "2026-02-02"
         }
       ],
       "balances": [
+        {
+          "date": "2026-02-10",
+          "value": "510,36"
+        },
+        {
+          "date": "2026-02-09",
+          "value": "507,39"
+        },
         {
           "date": "2026-02-06",
           "value": "498,29"
@@ -465,16 +501,20 @@
       "aportes": [
         {
           "value": "100",
-          "return": "-30,20",
+          "return": "-23,89",
           "date": "2026-01-16"
         },
         {
           "value": "500",
-          "return": "-224,19",
+          "return": "-199,25",
           "date": "2025-01-14"
         }
       ],
       "balances": [
+        {
+          "date": "2026-02-09",
+          "value": "376,86"
+        },
         {
           "date": "2026-02-06",
           "value": "379,35"
@@ -635,14 +675,14 @@
     },
     {
       "name": "Absolute Creta Advisory FIF FIRF",
-      "enabled": false,
+      "enabled": true,
       "target": "0",
       "expanded": false,
       "id": "fund-s75fij7wc",
       "aportes": [
         {
           "value": "137,10",
-          "return": "4,32",
+          "return": "4,41",
           "date": "2025-11-05"
         },
         {
@@ -657,11 +697,19 @@
         },
         {
           "value": "1.865,64",
-          "return": "297,71",
+          "return": "299,05",
           "date": "2025-01-14"
         }
       ],
       "balances": [
+        {
+          "date": "2026-02-10",
+          "value": "3.902,10"
+        },
+        {
+          "date": "2026-02-09",
+          "value": "3.900,23"
+        },
         {
           "date": "2026-02-06",
           "value": "3.897,82"
@@ -766,23 +814,31 @@
     },
     {
       "name": "ARX Fuji FIC RF CP RL",
-      "enabled": false,
+      "enabled": true,
       "target": "0",
       "expanded": false,
       "id": "fund-0rqdj300h",
       "aportes": [
         {
           "value": "994,18",
-          "return": "69,03",
+          "return": "69,63",
           "date": "2025-08-18"
         },
         {
           "value": "1.964,53",
-          "return": "318,29",
+          "return": "319,57",
           "date": "2025-01-14"
         }
       ],
       "balances": [
+        {
+          "date": "2026-02-10",
+          "value": "3.349,74"
+        },
+        {
+          "date": "2026-02-09",
+          "value": "3.347,91"
+        },
         {
           "date": "2026-02-06",
           "value": "3.346,03"
@@ -892,6 +948,10 @@
       ],
       "balances": [
         {
+          "date": "2026-02-11",
+          "value": "2.354,56"
+        },
+        {
           "date": "2026-02-10",
           "value": "2.353,56"
         },
@@ -976,6 +1036,10 @@
       ],
       "balances": [
         {
+          "date": "2026-02-11",
+          "value": "547,99"
+        },
+        {
           "date": "2026-02-10",
           "value": "547,69"
         },
@@ -1055,6 +1119,10 @@
         }
       ],
       "balances": [
+        {
+          "date": "2026-02-11",
+          "value": "10.730,06"
+        },
         {
           "date": "2026-02-10",
           "value": "10.722,97"

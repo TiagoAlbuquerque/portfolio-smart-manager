@@ -420,17 +420,25 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Update period return display
         const periodReturnValueEl = document.getElementById('period-return-value');
+        const periodStartEquityEl = document.getElementById('period-start-equity');
+        const periodContributionsEl = document.getElementById('period-contributions');
+        const periodEndEquityEl = document.getElementById('period-end-equity');
         if (periodReturnValueEl && chartResult) {
             if (chartResult.periodReturnPct !== null) {
                 const returnPct = chartResult.periodReturnPct;
-                const returnBRL = chartResult.periodReturn;
                 const periodLabel = chartResult.periodLabel;
                 const isPositive = returnPct >= 0;
                 const colorClass = isPositive ? 'text-green-600' : 'text-red-600';
                 const sign = isPositive ? '+' : '';
                 periodReturnValueEl.innerHTML = `<span class="${colorClass}">${sign}${formatPct(returnPct)}</span> <span class="text-gray-400">(${periodLabel})</span>`;
+                if (periodStartEquityEl) periodStartEquityEl.textContent = formatBRL(chartResult.startEquity);
+                if (periodContributionsEl) periodContributionsEl.textContent = formatBRL(chartResult.contributions);
+                if (periodEndEquityEl) periodEndEquityEl.textContent = formatBRL(chartResult.endEquity);
             } else {
                 periodReturnValueEl.textContent = '--';
+                if (periodStartEquityEl) periodStartEquityEl.textContent = '--';
+                if (periodContributionsEl) periodContributionsEl.textContent = '--';
+                if (periodEndEquityEl) periodEndEquityEl.textContent = '--';
             }
         }
 
@@ -582,6 +590,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 // Update asset period return display
                 const assetPeriodReturnEl = fundEl.querySelector('.asset-period-return');
+                const assetStartEquityEl = fundEl.querySelector('.asset-period-start-equity');
+                const assetContributionsEl = fundEl.querySelector('.asset-period-contributions');
+                const assetEndEquityEl = fundEl.querySelector('.asset-period-end-equity');
                 if (assetPeriodReturnEl && assetChartResult) {
                     if (assetChartResult.periodReturnPct !== null) {
                         const returnPct = assetChartResult.periodReturnPct;
@@ -590,8 +601,14 @@ document.addEventListener('DOMContentLoaded', function () {
                         const colorClass = isPositive ? 'text-green-600' : 'text-red-600';
                         const sign = isPositive ? '+' : '';
                         assetPeriodReturnEl.innerHTML = `<span class="${colorClass}">${sign}${formatPct(returnPct)}</span> <span class="text-gray-400">(${periodLabel})</span>`;
+                        if (assetStartEquityEl) assetStartEquityEl.textContent = formatBRL(assetChartResult.startEquity);
+                        if (assetContributionsEl) assetContributionsEl.textContent = formatBRL(assetChartResult.contributions);
+                        if (assetEndEquityEl) assetEndEquityEl.textContent = formatBRL(assetChartResult.endEquity);
                     } else {
                         assetPeriodReturnEl.textContent = '--';
+                        if (assetStartEquityEl) assetStartEquityEl.textContent = '--';
+                        if (assetContributionsEl) assetContributionsEl.textContent = '--';
+                        if (assetEndEquityEl) assetEndEquityEl.textContent = '--';
                     }
                 }
             }

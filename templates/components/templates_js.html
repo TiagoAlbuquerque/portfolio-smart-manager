@@ -181,17 +181,39 @@
                             <div class="asset-total-equity-big text-xl font-black text-indigo-900">R$ 0,00</div>
                         </div>
                     </div>
-                    <div class="flex items-center justify-between text-[9px] font-bold mb-2 px-1">
-                        <label
-                            class="flex items-center gap-1 cursor-pointer text-gray-400 hover:text-gray-600 transition-colors">
-                            <input type="checkbox"
-                                class="asset-show-invested w-3 h-3 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
-                                unchecked>
-                            <span>Investido</span>
-                        </label>
-                        <div class="flex items-center gap-2">
-                            <span class="text-gray-400">Retorno do Período:</span>
-                            <span class="asset-period-return text-indigo-600">--</span>
+                    <div class="asset-period-info mt-1 mb-2 px-1">
+                        <div class="flex items-center mb-1.5">
+                            <label
+                                class="flex items-center gap-1 cursor-pointer text-gray-400 hover:text-gray-600 transition-colors text-[9px] font-bold">
+                                <input type="checkbox"
+                                    class="asset-show-invested w-3 h-3 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                                    unchecked>
+                                <span>Investido</span>
+                            </label>
+                        </div>
+                        <div class="grid grid-cols-4 gap-1 text-center">
+                            <div class="bg-gray-50 rounded-lg px-1 py-1 border border-gray-100">
+                                <div class="text-[7px] font-black text-gray-400 uppercase tracking-wider">Pat. Inicial
+                                </div>
+                                <div class="asset-period-start-equity text-[9px] font-black text-gray-700 mt-0.5">--
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 rounded-lg px-1 py-1 border border-gray-100">
+                                <div class="text-[7px] font-black text-gray-400 uppercase tracking-wider">Aportes</div>
+                                <div class="asset-period-contributions text-[9px] font-black text-gray-700 mt-0.5">--
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 rounded-lg px-1 py-1 border border-gray-100">
+                                <div class="text-[7px] font-black text-gray-400 uppercase tracking-wider">Pat. Final
+                                </div>
+                                <div class="asset-period-end-equity text-[9px] font-black text-indigo-700 mt-0.5">--
+                                </div>
+                            </div>
+                            <div class="bg-indigo-50 rounded-lg px-1 py-1 border border-indigo-100">
+                                <div class="text-[7px] font-black text-indigo-400 uppercase tracking-wider">Retorno
+                                </div>
+                                <div class="asset-period-return text-[9px] font-black text-indigo-700 mt-0.5">--</div>
+                            </div>
                         </div>
                     </div>
                     <div class="relative w-full h-[200px] overflow-hidden">

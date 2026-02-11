@@ -27,6 +27,10 @@ export const calculatePeriodReturn = (equityData, investedData) => {
     const contributionsDuringPeriod = endInvested - startInvested;
     const base = startEquity + contributionsDuringPeriod;
 
+    result.startEquity = startEquity;
+    result.endEquity = endEquity;
+    result.contributions = contributionsDuringPeriod;
+
     if (base > 0) {
         result.periodReturnPct = (endEquity / base) - 1;
         result.periodReturn = endEquity - base;
@@ -192,7 +196,8 @@ export const updateAssetCharts = (fundEl, timeline, currentValue, balancePoints 
     const filteredInvestedPoints = filterAndNormalizeData(investedPoints, filterType, 'STEP');
 
     // Calculate period return using centralized function
-    const { periodReturnPct, periodLabel } = calculatePeriodReturn(filteredPoints, filteredInvestedPoints);
+    const periodResult = calculatePeriodReturn(filteredPoints, filteredInvestedPoints);
+    const { periodReturnPct, periodLabel } = periodResult;
 
     // Build datasets array conditionally
     const datasets = [
@@ -238,7 +243,7 @@ export const updateAssetCharts = (fundEl, timeline, currentValue, balancePoints 
         }
     });
 
-    return { periodReturnPct, periodLabel };
+    return periodResult;
 };
 
 export const updateHistoryChart = (equityData, investedData, currentVal, filterType, canvasId = 'historyChart', showInvested = true) => {
@@ -251,7 +256,8 @@ export const updateHistoryChart = (equityData, investedData, currentVal, filterT
     const filteredInvestedData = filterAndNormalizeData(investedData, filterType, 'STEP');
 
     // Calculate period return using centralized function
-    const { periodReturnPct, periodReturn, periodLabel } = calculatePeriodReturn(filteredEquityData, filteredInvestedData);
+    const periodResult = calculatePeriodReturn(filteredEquityData, filteredInvestedData);
+    const { periodReturnPct, periodReturn, periodLabel } = periodResult;
 
     // Build datasets array conditionally
     const datasets = [
@@ -296,7 +302,7 @@ export const updateHistoryChart = (equityData, investedData, currentVal, filterT
         }
     });
 
-    return { periodReturn, periodReturnPct, periodLabel };
+    return periodResult;
 };
 
 export const renderAllocationChart = (canvasId, labels, values) => {
