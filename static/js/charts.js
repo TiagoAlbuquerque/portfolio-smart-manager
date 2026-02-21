@@ -109,8 +109,11 @@ const filterAndNormalizeData = (data, filterType, method = 'LINEAR') => {
         startDate = new Date();
         startDate.setHours(0, 0, 0, 0); // Start of that day
         const monthFilters = { '1M': 1, '2M': 2, '3M': 3, '6M': 6, '12M': 12 };
+        const dayFilters = { '7D': 7, '14D': 14 };
         if (monthFilters[filterType]) {
             startDate.setMonth(now.getMonth() - monthFilters[filterType]);
+        } else if (dayFilters[filterType]) {
+            startDate.setDate(now.getDate() - dayFilters[filterType]);
         } else if (filterType === 'YTD') {
             startDate = new Date(now.getFullYear(), 0, 1);
         } else {
